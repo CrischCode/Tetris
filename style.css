@@ -5,3 +5,9 @@ body {
     place-content: center;
     height: 100vh;
 }
+
+.canvas-contenedor {
+    background-color: black;
+    padding: 12px 15px;
+    border-radius: 8px;
+}

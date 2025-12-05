@@ -48,5 +48,14 @@ export class Grid {
                 this.drawGrid(pos.x, pos.y, this.cellSize, "#000", "#555")
             }
         }
+        this.printMtriz()
+    }
+
+    printMtriz () {
+        let text = ""
+        this.matriz.forEach((row) => {
+            text += row.join(" ") + "\n"
+        })
+        console.log(text)
     }
 }
