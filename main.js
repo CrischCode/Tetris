@@ -2,9 +2,9 @@ const canvas = document.querySelector("canvas");
 const context = canvas.getContext("2d");
 const $score = document.querySelector('span');
 
-const BLOCK_SIZE = 20;
+const BLOCK_SIZE = 22;
 const BLOCK_WIDTH = 14;
-const BOARD_HEIGHT = 30;
+const BOARD_HEIGHT = 25;
 let score = 0;
 
 canvas.width = BLOCK_SIZE * BLOCK_WIDTH;
@@ -16,55 +16,70 @@ const board = Array.from({ length: BOARD_HEIGHT }, () => Array(BLOCK_WIDTH).fill
 
 // Piezas
 const PIECES = [
-    // O
-    [
-        [1,1],
-        [1,1]
-    ],
-
-    // I
-    [
-        [1,1,1,1]
-    ],
-
-    // T
-    [
-        [0,1,0],
-        [1,1,1]
-    ],
-
-    // S
-    [
-        [0,1,1],
-        [1,1,0]
-    ],
-
-    // Z
-    [
-        [1,1,0],
-        [0,1,1]
-    ],
-
-    // L
-    [
-        [1,0],
-        [1,0],
-        [1,1]
-    ],
-
-    // J
-    [
-        [0,1],
-        [0,1],
-        [1,1]
-    ]
+    // 1: O (Amarillo)
+    { 
+        shape: [
+            [1, 1],
+            [1, 1]
+        ],
+        colorIndex: 1 
+    },
+    // 2: I (Cian)
+    { 
+        shape: [
+            [2, 2, 2, 2]
+        ],
+        colorIndex: 2 
+    },
+    // 3: T (Púrpura)
+    { 
+        shape: [
+            [0, 3, 0],
+            [3, 3, 3]
+        ],
+        colorIndex: 3 
+    },
+    // 4: Z (Rojo)
+    { 
+        shape: [
+            [4, 4, 0],
+            [0, 4, 4]
+        ],
+        colorIndex: 4 
+    },
+    // 5: S (Lima)
+    { 
+        shape: [
+            [0, 5, 5],
+            [5, 5, 0]
+        ],
+        colorIndex: 5 
+    },
+    // 6: L (Naranja)
+    { 
+        shape: [
+            [6, 0],
+            [6, 0],
+            [6, 6]
+        ],
+        colorIndex: 6 
+    },
+    // 7: J (Azul)
+    { 
+        shape: [
+            [0, 7],
+            [0, 7],
+            [7, 7]
+        ],
+        colorIndex: 7 
+    }
 ];
-
 
 // Pieza activa
 const piece = {
     position: { x: Math.floor(BLOCK_WIDTH / 2 - 1), y: 0 },
-    shape: PIECES[0].map(row => [...row])
+    shape: PIECES[0].shape.map(row => [...row]),
+    colorIndex: PIECES[0].colorIndex
 };
 
 // Game loop variables
@@ -98,8 +113,8 @@ function draw() {
     // Dibuja el tablero
     board.forEach((row, y) => {
         row.forEach((value, x) => {
-            if (value === 1) {
-                context.fillStyle = "yellow";
+            if (value !== 0) {
+                context.fillStyle = COLORS[value];
                 context.fillRect(x, y, 1, 1);
             }
         });
@@ -108,8 +123,8 @@ function draw() {
     // Dibuja la pieza activa
     piece.shape.forEach((row, dy) => {
         row.forEach((value, dx) => {
-            if (value === 1) {
-                context.fillStyle = "red";
+            if (value !== 0) {
+                context.fillStyle = COLORS[piece.colorIndex];
                 context.fillRect(dx + piece.position.x, dy + piece.position.y, 1, 1);
             }
         });
@@ -172,7 +187,7 @@ function checkCollision() {
                 boardY >= BOARD_HEIGHT ||
                 boardX < 0 ||
                 boardX >= BLOCK_WIDTH ||
-                board[boardY]?.[boardX] === 1
+                board[boardY]?.[boardX] !== 0
             );
         });
     });
@@ -182,15 +197,17 @@ function checkCollision() {
 function solidifyPiece() {
     piece.shape.forEach((row, dy) => {
         row.forEach((value, dx) => {
-            if (value === 1) {
-                board[dy + piece.position.y][dx + piece.position.x] = 1;
+            if (value !== 0) {
+                board[dy + piece.position.y][dx + piece.position.x] = value;
             }
         });
     });
 
     // Nueva pieza aleatoria (copia profunda)
-    const next = PIECES[Math.floor(Math.random() * PIECES.length)];
-    piece.shape = next.map(row => [...row]);
+    const nextPieceIndex = Math.floor(Math.random() * PIECES.length);
+    const next = PIECES[nextPieceIndex];
+    piece.shape = next.shape.map(row => [...row]);
+    piece.colorIndex = next.colorIndex;
     piece.position.x = Math.floor(BLOCK_WIDTH / 2 - Math.floor(piece.shape[0].length / 2));
     piece.position.y = 0;
 
@@ -205,7 +222,7 @@ function solidifyPiece() {
 function removeRows() {
     const rowsToRemove = [];
     board.forEach((row, y) => {
-        if (row.every((value) => value === 1)) {
+        if (row.every((value) => value !== 0)) {
             rowsToRemove.push(y);
         }
     });
@@ -217,5 +234,18 @@ function removeRows() {
         score += 10;
     });
 }
+
+// Darle color a la pieza 
+
+const COLORS = [
+    null,
+    'yellow',
+    'cyan',
+    'purple',
+    'green',
+    'red',
+    'orange',
+    'blue'
+]
 
 update();
